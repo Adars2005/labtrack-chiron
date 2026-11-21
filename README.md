@@ -58,7 +58,8 @@ Built as the take-home for Chiron Labs' Forward Deployed Engineer role. The thre
 - Full case information, clinic contact and activity timeline.
 - **Side-by-side deadline proof**: clinic local view and lab local view of the same instant, with offsets and the underlying stored UTC ISO string.
 - Clinic-local date/time entered, clinic timezone, and computed UTC instant all shown explicitly.
-- **Mark as ready** action: status changes, timeline updates and a clinic email is captured.
+- **Mark as ready** action: status changes, timeline updates and a clinic email is sent automatically.
+- Status can be changed inline (Received / In progress / Ready / Completed) with an activity-timeline entry; choosing Ready triggers the clinic email.
 
 ### Clinics
 - Clinic directory with country, IANA timezone, contact and configured notification email.
@@ -88,7 +89,7 @@ Rules enforced in code:
 - DST is delegated to Luxon.
 - Device and server timezones are never consulted for deadline logic.
 
-Verification: `npm test` runs 8 regression tests covering London winter/summer, New York, Kolkata/Dubai offsets, invalid zones, date-only display, and cross-zone calendar-day comparisons.
+Verification: `npm test` runs 11 tests — 8 timezone regressions (London winter/summer, New York, Kolkata/Dubai offsets, invalid zones, date-only display, cross-zone calendar-day comparisons) plus 3 email-copy/idempotency checks.
 
 ---
 
@@ -109,6 +110,7 @@ Mark as ready
 - **Live mode:** set `NOTIFY_MODE=live` and `RESEND_API_KEY` in Vercel, optionally `NOTIFICATION_FROM_EMAIL`. The UI banner switches to "Live delivery is on". Resend's `onboarding@resend.dev` sender works for the account owner's address while testing.
 - **Test mode:** with no key (the current deployment), the endpoint returns `Sent (Simulation)` so the whole flow still works end to end without credentials.
 - **Idempotent.** One `CASE_READY` notification per case, so double-clicking never produces two emails.
+- **Send test field** on the Notifications page posts a sample message through the same API, so live delivery can be verified with your own inbox before the demo. Seeded clinic addresses are fictional, so in live mode send to your own address (or a verified domain recipient) — Resend rejects unregistered test domains.
 - **Failure-aware.** Provider errors are surfaced as `Failed` with the reason, and Retry re-posts to `/api/notify`; the status change is never rolled back because mail failed. The "simulate failure" switch exercises the same path without a provider.
 - **Copy.** `buildReadyEmail()` in `lib/seed.ts` holds the template; `lib/store.tsx` injects the deadline in clinic local time before posting.
 

@@ -17,8 +17,9 @@ import {
 import { useState } from "react";
 import { DeadlineDisplay, DueBadge, StatusBadge } from "@/components/domain";
 import { EmailPreviewModal, NotificationStatusChip } from "@/components/email-preview";
-import { Button, Card, EmptyState } from "@/components/ui";
+import { Button, Card, EmptyState, Label, Select } from "@/components/ui";
 import { useLabTrack } from "@/lib/store";
+import type { CaseStatus } from "@/lib/types";
 import {
   demoNow,
   displayDeadline,
@@ -36,6 +37,7 @@ export default function CaseDetailPage() {
     deadlineView,
     labTimezone,
     markReady,
+    setCaseStatus,
     referenceNow,
     deliveryMode,
   } = useLabTrack();
@@ -75,6 +77,11 @@ export default function CaseDetailPage() {
       setJustSent(true);
       setPreviewId(created.id);
     }
+  }
+
+  function handleStatusChange(value: CaseStatus) {
+    if (value === "Ready") handleReady();
+    else setCaseStatus(kase!.id, value);
   }
 
   return (
@@ -271,6 +278,21 @@ export default function CaseDetailPage() {
                 </div>
               ))}
             </dl>
+            <div className="border-t border-slate-100 px-5 py-4">
+              <Label hint="Changing to Ready sends the clinic email automatically">
+                Update status
+              </Label>
+              <Select
+                aria-label="Update case status"
+                value={kase.status}
+                onChange={(e) => handleStatusChange(e.target.value as CaseStatus)}
+              >
+                <option value="Received">Received</option>
+                <option value="In progress">In progress</option>
+                <option value="Ready">Ready</option>
+                <option value="Completed">Completed</option>
+              </Select>
+            </div>
           </Card>
 
           <Card>

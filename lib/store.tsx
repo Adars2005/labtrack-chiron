@@ -19,6 +19,7 @@ import {
 } from "./timezone";
 import type {
   AppState,
+  CaseStatus,
   Clinic,
   DeadlineView,
   LabCase,
@@ -54,6 +55,7 @@ interface StoreValue extends AppState {
   addCase: (input: NewCaseInput) => LabCase;
   addClinic: (input: NewClinicInput) => Clinic;
   markReady: (caseId: string) => Notification | null;
+  setCaseStatus: (caseId: string, status: Exclude<CaseStatus, "Ready">) => void;
   retryNotification: (id: string) => void;
   resetDemo: () => void;
 }
@@ -315,6 +317,36 @@ export function LabTrackProvider({ children }: { children: ReactNode }) {
     [deliverNotification],
   );
 
+  const setCaseStatus = useCallback(
+    (caseId: string, status: Exclude<CaseStatus, "Ready">) => {
+      const current = stateRef.current;
+      const kase = current.cases.find((c) => c.id === caseId);
+      if (!kase || kase.status === status) return;
+      setState((s) => ({
+        ...s,
+        cases: s.cases.map((c) =>
+          c.id === caseId
+            ? {
+                ...c,
+                status,
+                timeline: [
+                  ...c.timeline,
+                  {
+                    id: uid("ev"),
+                    label: `Status changed to ${status}`,
+                    detail: "Updated by lab coordinator",
+                    at: demoTime(s),
+                    actor: "Lab coordinator",
+                  },
+                ],
+              }
+            : c,
+        ),
+      }));
+    },
+    [],
+  );
+
   const retryNotification = useCallback(
     (id: string) => {
       const current = stateRef.current;
@@ -349,6 +381,7 @@ export function LabTrackProvider({ children }: { children: ReactNode }) {
       addCase,
       addClinic,
       markReady,
+      setCaseStatus,
       retryNotification,
       resetDemo,
     }),
@@ -362,6 +395,7 @@ export function LabTrackProvider({ children }: { children: ReactNode }) {
       addCase,
       addClinic,
       markReady,
+      setCaseStatus,
       retryNotification,
       resetDemo,
     ],

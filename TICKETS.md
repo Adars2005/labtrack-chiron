@@ -47,6 +47,7 @@ Changing the meaning of "due date" (deadline vs dispatch vs receipt) until Maria
 - [x] Duplicate notifications are prevented at the data level — one `CASE_READY` notification per case, even on double-click or retry.
 - [x] Notification status is visible to lab staff (`Sending` → `Sent (Simulation)` / `Failed`).
 - [x] A "simulate delivery failure" switch and retry action make the failure path demoable and verifiable.
+- [x] A "Send test" field on the Notifications page posts a sample message through the same server API so live delivery can be verified with a real inbox.
 - [x] Server-side Resend adapter is implemented behind `/api/notify` and fires automatically on the ready transition; live delivery is enabled with `NOTIFY_MODE=live` + `RESEND_API_KEY` (currently in test mode pending Maria's approval of copy and recipients).
 
 ### Implementation note
@@ -75,6 +76,7 @@ WhatsApp/SMS (needs provider, verified number and clinic opt-in), multiple recip
 - [x] Layout works on desktop and smaller screens (responsive sidebar → top navigation, horizontally scrollable table).
 - [x] Primary actions (New case, Mark as ready) are easy to find; no dead buttons; empty states are handled.
 - [x] No data is lost — details live in the case detail view with an activity timeline.
+- [x] Case status can be changed from the detail view (Received / In progress / Ready / Completed), creating an activity entry; choosing Ready triggers the clinic email.
 
 ### Out of scope
 

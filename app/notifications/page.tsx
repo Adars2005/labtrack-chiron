@@ -1,9 +1,9 @@
 "use client";
 
 import { BellRing, CheckCircle2, Mail, RotateCcw, Send } from "lucide-react";
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { EmailPreviewModal, NotificationStatusChip } from "@/components/email-preview";
-import { Button, Card, EmptyState } from "@/components/ui";
+import { Button, Card, EmptyState, Input } from "@/components/ui";
 import { useLabTrack } from "@/lib/store";
 import { formatTimelineTime } from "@/lib/timezone";
 import { cn } from "@/lib/utils";
@@ -20,6 +20,49 @@ export default function NotificationsPage() {
   } = useLabTrack();
   const [previewId, setPreviewId] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "failed">("all");
+  const [testEmail, setTestEmail] = useState("");
+  const [testState, setTestState] = useState<"idle" | "sending" | "sent" | "failed">(
+    "idle",
+  );
+  const [testMessage, setTestMessage] = useState("");
+
+  async function sendTestEmail(e: FormEvent) {
+    e.preventDefault();
+    setTestState("sending");
+    setTestMessage("");
+    try {
+      const response = await fetch("/api/notify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: testEmail,
+          subject: "LabTrack — test email",
+          body:
+            "Hello from LabTrack.\n\nThis is a test message to verify that ready-case email delivery is working correctly.\n\nThanks,\nLabTrack team",
+        }),
+      });
+      const result = (await response.json()) as {
+        status?: string;
+        error?: string;
+      };
+      if (result.status === "Failed") {
+        setTestState("failed");
+        setTestMessage(result.error ?? "Delivery failed");
+      } else {
+        setTestState("sent");
+        setTestMessage(
+          deliveryMode === "live"
+            ? "Sent — check the inbox."
+            : "Captured in test mode.",
+        );
+      }
+    } catch (error) {
+      setTestState("failed");
+      setTestMessage(
+        error instanceof Error ? error.message : "Could not reach the email service",
+      );
+    }
+  }
 
   const shown = notifications.filter((n) =>
     filter === "failed" ? n.status === "Failed" : true,
@@ -58,6 +101,31 @@ export default function NotificationsPage() {
           />
           Simulate delivery failure
         </label>
+        <form
+          onSubmit={sendTestEmail}
+          className="flex w-full flex-wrap items-center gap-2 border-t border-amber-200/70 pt-3 lg:w-auto lg:border-0 lg:pt-0"
+        >
+          <Input
+            type="email"
+            required
+            value={testEmail}
+            onChange={(e) => setTestEmail(e.target.value)}
+            placeholder="Send a test email to…"
+            className="h-9 w-full bg-white sm:w-[230px]"
+            aria-label="Test email recipient"
+          />
+          <Button type="submit" size="sm" disabled={testState === "sending"}>
+            <Send className="h-3.5 w-3.5" />
+            {testState === "sending" ? "Sending…" : "Send test"}
+          </Button>
+          {testState !== "idle" ? (
+            <span
+              className={`text-xs font-medium ${testState === "failed" ? "text-rose-700" : "text-emerald-700"}`}
+            >
+              {testMessage}
+            </span>
+          ) : null}
+        </form>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">

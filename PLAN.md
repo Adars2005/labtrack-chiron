@@ -38,8 +38,9 @@
 ## Verification performed
 
 - `npm run build` — passes.
-- `npm test` — 8/8 timezone tests pass.
+- `npm test` — 11/11 tests pass (timezone + email copy/idempotency).
 - Browser walkthrough: overview → cases → case detail → Mark as ready → email preview → outbox → clinics, with no console errors.
+- Final additions verified in-browser: Send test email form, inline status editing, live/test mode banner.
 - Screenshots captured into `docs/screenshots/`.
 
 ## Remaining handoff steps
