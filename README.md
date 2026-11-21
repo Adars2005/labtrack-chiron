@@ -2,8 +2,8 @@
 
 **Dental lab operations dashboard** — a small, demo-ready SaaS app for a dental lab tracking cases sent by clinics.
 
-> **Live demo:** `TODO — add Vercel URL before submitting`
-> **Public repo:** `TODO — add GitHub URL before submitting`
+> **Live demo:** https://labtrack-chiron.vercel.app
+> **Public repo:** https://github.com/Adars2005/labtrack-chiron
 > **Loom walkthrough:** `TODO — add Loom URL before submitting`
 
 Built as the take-home for Chiron Labs' Forward Deployed Engineer role. The three client asks were: fix international due dates, notify clinics when a case is ready, and simplify a cluttered dashboard.

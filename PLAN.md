@@ -12,7 +12,7 @@
 | P1 | Case detail with deadline proof, activity timeline, clinic info | ✅ Done |
 | P1 | Demo quality: no broken buttons, responsive, no empty-state dead ends | ✅ Done |
 | P1 | Written deliverables: tickets, client email, application email, Loom script | ✅ Drafted (links/TODOs to fill) |
-| P0 | Deploy to Vercel + public GitHub repo | ⏳ Needs account access / credentials |
+| P0 | Deploy to Vercel + public GitHub repo | ✅ Done — https://labtrack-chiron.vercel.app · https://github.com/Adars2005/labtrack-chiron |
 
 ## Build order used
 
@@ -44,8 +44,8 @@
 
 ## Remaining handoff steps
 
-1. Replace `TODO` placeholders in `README.md`, `docs/CLIENT_UPDATE.md` and `docs/APPLICATION_EMAIL.md`.
-2. Create the public GitHub repo and push; add the URL to the documents.
-3. Deploy to Vercel (no env vars needed for demo mode); add the live URL.
-4. Record the ≤3 minute Loom using `docs/LOOM_SCRIPT.md`.
+1. ✅ Create the public GitHub repo and push; add the URL to the documents.
+2. ✅ Deploy to Vercel (no env vars needed for demo mode); add the live URL.
+3. Record the ≤3 minute Loom using `docs/LOOM_SCRIPT.md` and add the URL to the three docs.
+4. Fill in the personal placeholders in `docs/APPLICATION_EMAIL.md` (name, end-to-end example, start date, salary, LinkedIn).
 5. Send the application email to `tlpeter [at] chironlabs [dot] co` with exact subject **FDE – Your Name – Friday demo** and all links.

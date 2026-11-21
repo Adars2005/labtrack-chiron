@@ -13,9 +13,9 @@ Quick update before Friday. I've built a working LabTrack demo and focused it on
 - **The dashboard is simpler.** It now opens on an action queue — overdue, due today, ready — with the four numbers you care about at the top. The cases table has search, status and clinic filters, and clear badges. Full details are one click away, so nothing was removed.
 - **Demo-ready:** 56 synthetic cases across eight international clinics, no real patient data, and no broken buttons.
 
-**Live demo:** `TODO — Vercel URL`
-**Code:** `TODO — public GitHub URL`
-**2-minute walkthrough:** `TODO — Loom URL`
+**Live demo:** https://labtrack-chiron.vercel.app
+**Code:** https://github.com/Adars2005/labtrack-chiron
+**2-minute walkthrough:** `TODO — add Loom URL`
 
 **What I did not ship, and why**
 

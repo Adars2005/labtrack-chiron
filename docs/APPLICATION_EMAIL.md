@@ -9,11 +9,11 @@ I've attached my take-home for the Forward Deployed Engineer role. I built LabTr
 
 **Deliverables**
 
-1. Tickets, acceptance criteria and client questions: `TODO — link to TICKETS.md in the public repo`
-2. Live application: `TODO — Vercel URL`
-3. Public GitHub repository (README with setup and screenshots): `TODO — GitHub URL`
-4. Client update email for Maria: `TODO — link or pasted below`
-5. Loom walkthrough (2m 40s): `TODO — Loom URL`
+1. Tickets, acceptance criteria and client questions: https://github.com/Adars2005/labtrack-chiron/blob/main/TICKETS.md
+2. Live application: https://labtrack-chiron.vercel.app
+3. Public GitHub repository (README with setup and screenshots): https://github.com/Adars2005/labtrack-chiron
+4. Client update email for Maria: https://github.com/Adars2005/labtrack-chiron/blob/main/docs/CLIENT_UPDATE.md
+5. Loom walkthrough (2m 40s): `TODO — add Loom URL`
 
 LinkedIn: `TODO — your profile URL`
 
