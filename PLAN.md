@@ -8,7 +8,7 @@
 |---|---|---|
 | P0 | Timezone bug solved properly (clinic-local input → UTC instant → correct display anywhere) | ✅ Done |
 | P0 | Premium, clean dashboard with metrics, filters and believable demo data | ✅ Done |
-| P0 | Functional ready notification with email preview + delivery log | ✅ Done (test mode) |
+| P0 | Functional ready notification with email preview + delivery log | ✅ Done — automatic server-side `/api/notify`; live via env vars |
 | P1 | Case detail with deadline proof, activity timeline, clinic info | ✅ Done |
 | P1 | Demo quality: no broken buttons, responsive, no empty-state dead ends | ✅ Done |
 | P1 | Written deliverables: tickets, client email, application email, Loom script | ✅ Drafted (links/TODOs to fill) |
@@ -32,7 +32,7 @@
 - **Timezone model:** clinic IANA zone is authoritative. Store one UTC instant; display in any zone with labelled offsets. No manual day shifts; Luxon handles DST.
 - **Urgency:** compare calendar dates inside the display zone, using a fixed demo reference instant so counts are reproducible.
 - **Persistence:** browser `localStorage` demo store (explicitly allowed by the brief), isolated in `lib/store.tsx` so a Supabase swap is a repository change. Vercel's filesystem is ephemeral, so a JSON file would not work.
-- **Email:** test-mode outbox by default; live Resend adapter deferred until Maria approves recipients and copy.
+- **Email:** Mark-as-ready automatically POSTs to `/api/notify`; Resend sends in live mode when `NOTIFY_MODE=live` + `RESEND_API_KEY` are set, otherwise the endpoint returns a captured result. No manual send step.
 - **Scope control:** WhatsApp, auth, full redesign and live sending deferred with reasons written to the client email.
 
 ## Verification performed
@@ -46,6 +46,7 @@
 
 1. ✅ Create the public GitHub repo and push; add the URL to the documents.
 2. ✅ Deploy to Vercel (no env vars needed for demo mode); add the live URL.
-3. Record the ≤3 minute Loom using `docs/LOOM_SCRIPT.md` and add the URL to the three docs.
-4. Fill in the personal placeholders in `docs/APPLICATION_EMAIL.md` (name, end-to-end example, start date, salary, LinkedIn).
-5. Send the application email to `tlpeter [at] chironlabs [dot] co` with exact subject **FDE – Your Name – Friday demo** and all links.
+3. To enable real inbox delivery, add `NOTIFY_MODE=live` and `RESEND_API_KEY` to Vercel project env vars and redeploy (no code change needed).
+4. Record the ≤3 minute Loom using `docs/LOOM_SCRIPT.md` and add the URL to the three docs.
+5. Fill in the personal placeholders in `docs/APPLICATION_EMAIL.md` (name, end-to-end example, start date, salary, LinkedIn).
+6. Send the application email to `tlpeter [at] chironlabs [dot] co` with exact subject **FDE – Your Name – Friday demo** and all links.

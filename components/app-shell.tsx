@@ -46,6 +46,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     notifications,
     resetDemo,
     hydrated,
+    deliveryMode,
   } = useLabTrack();
   const [newCaseOpen, setNewCaseOpen] = useState(false);
   const [toast, setToast] = useState("");
@@ -118,10 +119,14 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <span className="absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-60" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-500" />
               </span>
-              <p className="text-xs font-semibold text-amber-800">Demo mode</p>
+              <p className="text-xs font-semibold text-amber-800">
+                {deliveryMode === "live" ? "Live email delivery" : "Test mode"}
+              </p>
             </div>
             <p className="mt-1.5 text-[11px] leading-relaxed text-amber-700/80">
-              Emails are captured in the outbox. Nothing leaves the browser.
+              {deliveryMode === "live"
+                ? "Ready emails are sent immediately via the mail provider."
+                : "Ready emails are sent to the in-app outbox. Set RESEND_API_KEY and NOTIFY_MODE=live for real delivery."}
             </p>
             <Button
               variant="ghost"

@@ -47,11 +47,11 @@ Changing the meaning of "due date" (deadline vs dispatch vs receipt) until Maria
 - [x] Duplicate notifications are prevented at the data level — one `CASE_READY` notification per case, even on double-click or retry.
 - [x] Notification status is visible to lab staff (`Sending` → `Sent (Simulation)` / `Failed`).
 - [x] A "simulate delivery failure" switch and retry action make the failure path demoable and verifiable.
-- [ ] Live provider (Resend) adapter is scaffolded via env vars but deliberately not enabled before Maria approves the copy and recipients.
+- [x] Server-side Resend adapter is implemented behind `/api/notify` and fires automatically on the ready transition; live delivery is enabled with `NOTIFY_MODE=live` + `RESEND_API_KEY` (currently in test mode pending Maria's approval of copy and recipients).
 
 ### Implementation note
 
-Notification writes are treated as an outbox: the status change and the notification record are created together, and delivery settles asynchronously. The email body is pure copy in `lib/seed.ts` (`buildReadyEmail`) with the deadline injected from `displayDeadline()`.
+Notification writes are treated as an outbox: the status change and the notification record are created together, and a server API call (`POST /api/notify`) is fired automatically — no manual send step. The API calls Resend in live mode and returns a captured result in test mode. The email body is pure copy in `lib/seed.ts` (`buildReadyEmail`) with the deadline injected from `displayDeadline()`.
 
 ### Out of scope
 

@@ -28,7 +28,7 @@
 
 *Click. Wait for the toast and email modal.*
 
-"Status is now Ready, the timeline recorded it, and an email was captured — not sent, because test mode is on. You can see the exact message: case reference, treatment, clinic, and the due date rendered in the clinic's timezone. There's one record per case, so double-clicking can't spam the clinic. In the notification log I can see delivery status, preview anything, and even simulate a failure and retry it — because 'did it send?' is a question the lab will ask on day one."
+"Status is now Ready, the timeline recorded it, and the email was sent automatically — no separate send button. It went through a server API. We're in test mode, so it was captured rather than delivered to a real inbox; flipping `NOTIFY_MODE=live` with a Resend key switches on real delivery. You can see the exact message: case reference, treatment, clinic, and the due date in the clinic's timezone. One record per case, so double-clicking can't spam the clinic. The log shows delivery status, and I can simulate a failure and retry it — because 'did it send?' is a question the lab will ask on day one."
 
 ---
 

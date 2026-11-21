@@ -47,7 +47,13 @@ export function EmailPreviewModal({
       open={Boolean(note)}
       onClose={onClose}
       title="Email preview"
-      description="Test mode — this message was captured, not delivered."
+      description={
+        note?.status === "Sent"
+          ? "Delivered via the mail provider."
+          : note?.status === "Failed"
+            ? "Delivery failed — retry from the delivery log."
+            : "Test mode — this message was captured, not delivered."
+      }
       width="max-w-2xl"
     >
       {note ? (

@@ -16,6 +16,7 @@ export default function NotificationsPage() {
     simulateFailure,
     setSimulateFailure,
     retryNotification,
+    deliveryMode,
   } = useLabTrack();
   const [previewId, setPreviewId] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "failed">("all");
@@ -37,12 +38,14 @@ export default function NotificationsPage() {
           </span>
           <div>
             <p className="text-sm font-semibold text-amber-900">
-              Test mode is on — no real emails are sent
+              {deliveryMode === "live"
+                ? "Live delivery is on — emails send automatically"
+                : "Test mode is on — no real emails are sent"}
             </p>
             <p className="mt-0.5 max-w-2xl text-xs leading-relaxed text-amber-800/80">
-              Every “Mark as ready” action writes an immutable delivery record
-              here so the lab can review the exact message before going live.
-              One notification per case, even if the button is clicked twice.
+              Every “Mark as ready” action automatically sends the email through
+              the server API and writes the delivery record here. One notification
+              per case, even if the button is clicked twice.
             </p>
           </div>
         </div>

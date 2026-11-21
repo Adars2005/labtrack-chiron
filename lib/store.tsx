@@ -47,6 +47,7 @@ interface NewClinicInput {
 
 interface StoreValue extends AppState {
   hydrated: boolean;
+  deliveryMode: "test" | "live";
   setDeadlineView: (view: DeadlineView) => void;
   setLabTimezone: (zone: string) => void;
   setSimulateFailure: (value: boolean) => void;
@@ -68,6 +69,7 @@ export function LabTrackProvider({ children }: { children: ReactNode }) {
   // Deterministic first render (server + client) avoids hydration mismatch.
   const [state, setState] = useState<AppState>(() => seedData(DEMO_ANCHOR));
   const [hydrated, setHydrated] = useState(false);
+  const [deliveryMode, setDeliveryMode] = useState<"test" | "live">("test");
   const stateRef = useRef(state);
   stateRef.current = state;
 
@@ -84,6 +86,21 @@ export function LabTrackProvider({ children }: { children: ReactNode }) {
       setState(seedData(todayIso()));
     }
     setHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/config")
+      .then((res) => res.json())
+      .then((data: { mode?: string }) => {
+        if (active && data.mode === "live") setDeliveryMode("live");
+      })
+      .catch(() => {
+        // No config endpoint (e.g. static export) — stay in safe test mode.
+      });
+    return () => {
+      active = false;
+    };
   }, []);
 
   useEffect(() => {
@@ -168,25 +185,71 @@ export function LabTrackProvider({ children }: { children: ReactNode }) {
     return created;
   }, []);
 
-  const settleNotification = useCallback((id: string, fail: boolean) => {
-    window.setTimeout(() => {
-      setState((s) => ({
-        ...s,
-        notifications: s.notifications.map((n) =>
-          n.id === id
-            ? {
-                ...n,
-                status: fail ? "Failed" : "Sent (Simulation)",
-                sentAt: fail ? undefined : demoTime(stateRef.current),
-                error: fail
-                  ? "Simulated provider error (mailbox temporarily unavailable)"
-                  : undefined,
-              }
-            : n,
-        ),
-      }));
-    }, 700);
-  }, []);
+  /**
+   * Sends the email immediately through the server API. No manual "send" step.
+   * In test mode the API still confirms capture, so the UI behaves identically.
+   */
+  const deliverNotification = useCallback(
+    async (note: Notification, fail: boolean) => {
+      try {
+        const response = await fetch("/api/notify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            notificationId: note.id,
+            caseId: note.caseId,
+            to: note.to,
+            subject: note.subject,
+            body: note.body,
+            simulateFailure: fail,
+          }),
+        });
+        const result = (await response.json()) as {
+          status?: string;
+          mode?: string;
+          error?: string;
+        };
+        const status =
+          result.status === "Sent"
+            ? "Sent"
+            : result.status === "Failed"
+              ? "Failed"
+              : "Sent (Simulation)";
+
+        setState((s) => ({
+          ...s,
+          notifications: s.notifications.map((n) =>
+            n.id === note.id
+              ? {
+                  ...n,
+                  status,
+                  sentAt: status === "Failed" ? undefined : demoTime(s),
+                  error: result.error,
+                }
+              : n,
+          ),
+        }));
+        if (result.mode === "live") setDeliveryMode("live");
+      } catch (error) {
+        setState((s) => ({
+          ...s,
+          notifications: s.notifications.map((n) =>
+            n.id === note.id
+              ? {
+                  ...n,
+                  status: "Failed",
+                  error:
+                    error instanceof Error
+                      ? error.message
+                      : "Could not reach the email service",
+                }
+              : n,
+          ),
+        }));
+      }
+    },
+    [],
+  );
 
   const markReady = useCallback(
     (caseId: string): Notification | null => {
@@ -235,7 +298,7 @@ export function LabTrackProvider({ children }: { children: ReactNode }) {
                       {
                         id: uid("ev"),
                         label: "Marked ready for delivery",
-                        detail: "Clinic notification queued (test mode)",
+                        detail: "Clinic notification sent automatically",
                         at: demoTime(stateRef.current),
                         actor: "Lab coordinator",
                       },
@@ -246,10 +309,10 @@ export function LabTrackProvider({ children }: { children: ReactNode }) {
         notifications: [notification, ...s.notifications],
       }));
 
-      settleNotification(notification.id, current.simulateFailure);
+      void deliverNotification(notification, current.simulateFailure);
       return notification;
     },
-    [settleNotification],
+    [deliverNotification],
   );
 
   const retryNotification = useCallback(
@@ -265,9 +328,9 @@ export function LabTrackProvider({ children }: { children: ReactNode }) {
             : n,
         ),
       }));
-      settleNotification(id, current.simulateFailure);
+      void deliverNotification(note, current.simulateFailure);
     },
-    [settleNotification],
+    [deliverNotification],
   );
 
   const resetDemo = useCallback(() => {
@@ -279,6 +342,7 @@ export function LabTrackProvider({ children }: { children: ReactNode }) {
     () => ({
       ...state,
       hydrated,
+      deliveryMode,
       setDeadlineView,
       setLabTimezone,
       setSimulateFailure,
@@ -291,6 +355,7 @@ export function LabTrackProvider({ children }: { children: ReactNode }) {
     [
       state,
       hydrated,
+      deliveryMode,
       setDeadlineView,
       setLabTimezone,
       setSimulateFailure,

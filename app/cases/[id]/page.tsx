@@ -37,6 +37,7 @@ export default function CaseDetailPage() {
     labTimezone,
     markReady,
     referenceNow,
+    deliveryMode,
   } = useLabTrack();
   const [previewId, setPreviewId] = useState<string | null>(null);
   const [justSent, setJustSent] = useState(false);
@@ -116,7 +117,9 @@ export default function CaseDetailPage() {
         <div className="animate-in flex flex-wrap items-center justify-between gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
           <span className="flex items-center gap-2">
             <BellRing className="h-4 w-4" />
-            Case marked ready. Test email captured in the outbox.
+            {deliveryMode === "live"
+              ? "Case marked ready. Clinic email sent automatically."
+              : "Case marked ready. Email captured automatically in the outbox."}
           </span>
           <button
             className="font-semibold underline underline-offset-2"

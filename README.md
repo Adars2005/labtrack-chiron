@@ -92,22 +92,25 @@ Verification: `npm test` runs 8 regression tests covering London winter/summer, 
 
 ---
 
-## How notification simulation works
+## How email delivery works
 
 ```
 Mark as ready
    → case status = Ready + timeline event
    → CASE_READY notification row created (status: Sending)
-   → after ~700ms: Sent (Simulation) or Failed
-   → email preview / delivery log visible to lab staff
+   → POST /api/notify fires AUTOMATICALLY (no manual send click)
+        /api/notify → Resend API when NOTIFY_MODE=live + RESEND_API_KEY are set
+        /api/notify → captured result in test mode (no credentials needed)
+   → status becomes Sent / Sent (Simulation) / Failed
+   → email preview + delivery log visible to lab staff
 ```
 
-- **No credentials required.** `NOTIFY_MODE=test` is the default; messages stay in the browser.
-- **Idempotent.** A unique `caseId + type` guard means double-clicking never produces two emails.
-- **Failure-aware.** The "Simulate delivery failure" switch makes the lab see a failure and retry it; the status change is never rolled back because mail failed.
-- **Copy reviewed before go-live.** `buildReadyEmail()` contains the template; `lib/seed.ts` and `lib/store.tsx` inject the deadline in clinic local time.
-
-For a live deployment, set `NOTIFY_MODE=live` and `RESEND_API_KEY`, and replace the `settleNotification()` timer in `lib/store.tsx` with a server-side Resend call behind an API route. This is deliberately not enabled: recipient addresses and copy need Maria's approval.
+- **Automatic.** Sending is triggered by the server API on the ready transition; the client never asks the user to confirm a separate send.
+- **Live mode:** set `NOTIFY_MODE=live` and `RESEND_API_KEY` in Vercel, optionally `NOTIFICATION_FROM_EMAIL`. The UI banner switches to "Live delivery is on". Resend's `onboarding@resend.dev` sender works for the account owner's address while testing.
+- **Test mode:** with no key (the current deployment), the endpoint returns `Sent (Simulation)` so the whole flow still works end to end without credentials.
+- **Idempotent.** One `CASE_READY` notification per case, so double-clicking never produces two emails.
+- **Failure-aware.** Provider errors are surfaced as `Failed` with the reason, and Retry re-posts to `/api/notify`; the status change is never rolled back because mail failed. The "simulate failure" switch exercises the same path without a provider.
+- **Copy.** `buildReadyEmail()` in `lib/seed.ts` holds the template; `lib/store.tsx` injects the deadline in clinic local time before posting.
 
 ---
 
